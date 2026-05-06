@@ -1,6 +1,6 @@
 import Image from "next/image";
 import AnimationLayout from "./shared/animation-layout";
-import jobkoreaLogo from "/public/JOBKOREA logo.svg";
+import jobkoreaLogo from "/public/JOBKOREA logo.png";
 import kosmeLogo from "/public/KOSME logo.svg";
 import likelionLogo from "/public/LIKELION logo.svg";
 import mssLogo from "/public/MSS logo.svg";
