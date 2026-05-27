@@ -13,8 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
-
-// import { doc } from "@/lib/spreadsheet";
 import {
   REFERRAL_OPTIONS,
   registerFormSchema,
@@ -35,18 +33,14 @@ type IRegisterForm = z.infer<typeof registerFormSchema>;
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-const utmData = {
-  utm_source: searchParams.get("utm_source"),
-  utm_medium: searchParams.get("utm_medium"),
-  utm_campaign: searchParams.get("utm_campaign"),
-  utm_content: searchParams.get("utm_content"),
-};
+  const utmData = {
+    utm_source: searchParams.get("utm_source") ?? "",
+    utm_medium: searchParams.get("utm_medium") ?? "",
+    utm_campaign: searchParams.get("utm_campaign") ?? "",
+    utm_content: searchParams.get("utm_content") ?? "",
+  };
   const { startUpload, isUploading } = useUploadThing("pdfUploader", {
-    // onClientUploadComplete: () => {
-    //   alert("uploaded successfully!");
-    // },
     onUploadError: () => {
-      // Toast error
       alert("error occurred while uploading");
     },
   });
@@ -72,21 +66,20 @@ const utmData = {
   });
 
   async function onSubmit(values: IRegisterForm) {
-    // Track Facebook Pixel
     if (typeof window !== "undefined" && typeof window.fbq === "function") {
       window.fbq("track", "SubmitApplication");
     }
 
     const { cv_file, ...restData } = values;
-    if (!cv_file) {
-    mutate({ ...restData, ...utmData });
+
+    if (!cv_file || !(cv_file instanceof File)) {
+      mutate({ ...restData, ...utmData });
       return;
     }
-    const selectedFiles = new Array(cv_file);
-    const result = await startUpload(selectedFiles);
+
+    const result = await startUpload([cv_file]);
     if (result) {
-    const data = { ...restData, cv_url: result[0].url, ...utmData };
-      mutate(data);
+      mutate({ ...restData, cv_url: result[0].url, ...utmData });
     }
   }
 
@@ -156,7 +149,6 @@ const utmData = {
           form={form}
           required
         />
-
         <FormFieldInput
           name="major"
           label="Vị trí hiện tại"
@@ -165,7 +157,6 @@ const utmData = {
           form={form}
           required
         />
-
         <FormField
           control={form.control}
           name="cv_file"
@@ -180,7 +171,6 @@ const utmData = {
             </FormItemWrapper>
           )}
         />
-
         <FormField
           control={form.control}
           name="agree"
@@ -207,20 +197,13 @@ const utmData = {
                   của chương trình
                 </FormLabel>
               </div>
-
               <FormMessage />
             </FormItem>
           )}
         />
-
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isUploading
             ? "Vui lòng đợi trong giây lát.. "
             : isPending
             ? "Dữ liệu đang được xử lí..."
-            : "Ứng tuyển ngay"}
-        </Button>
-      </form>
-    </Form>
-  );
-}
+            : "Ứng tuyể
