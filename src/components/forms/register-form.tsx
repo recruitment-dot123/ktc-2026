@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -33,17 +34,23 @@ type IRegisterForm = z.infer<typeof registerFormSchema>;
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const utmData = {
-    utm_source: searchParams.get("utm_source") ?? "",
-    utm_medium: searchParams.get("utm_medium") ?? "",
-    utm_campaign: searchParams.get("utm_campaign") ?? "",
-    utm_content: searchParams.get("utm_content") ?? "",
-  };
+
+  useEffect(() => {
+    const source = searchParams.get("utm_source");
+    if (source) {
+      localStorage.setItem("utm_source", source);
+      localStorage.setItem("utm_medium", searchParams.get("utm_medium") ?? "");
+      localStorage.setItem("utm_campaign", searchParams.get("utm_campaign") ?? "");
+      localStorage.setItem("utm_content", searchParams.get("utm_content") ?? "");
+    }
+  }, [searchParams]);
+
   const { startUpload, isUploading } = useUploadThing("pdfUploader", {
     onUploadError: () => {
       alert("error occurred while uploading");
     },
   });
+
   const form = useForm<IRegisterForm>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
@@ -69,6 +76,13 @@ export default function RegisterForm() {
     if (typeof window !== "undefined" && typeof window.fbq === "function") {
       window.fbq("track", "SubmitApplication");
     }
+
+    const utmData = {
+      utm_source: localStorage.getItem("utm_source") ?? "",
+      utm_medium: localStorage.getItem("utm_medium") ?? "",
+      utm_campaign: localStorage.getItem("utm_campaign") ?? "",
+      utm_content: localStorage.getItem("utm_content") ?? "",
+    };
 
     const { cv_file, ...restData } = values;
 
@@ -206,4 +220,9 @@ export default function RegisterForm() {
             ? "Vui lòng đợi trong giây lát.. "
             : isPending
             ? "Dữ liệu đang được xử lí..."
-            : "Ứng tuyể
+            : "Ứng tuyển ngay"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
