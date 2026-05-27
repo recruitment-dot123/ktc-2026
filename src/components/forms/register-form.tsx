@@ -24,7 +24,7 @@ import { useUploadThing } from "@/utils/uploadthing";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import CVDropzone from "../cv-dropzone";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import FormFieldInput from "./form-fields/form-field-input";
@@ -34,6 +34,13 @@ type IRegisterForm = z.infer<typeof registerFormSchema>;
 
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+const utmData = {
+  utm_source: searchParams.get("utm_source"),
+  utm_medium: searchParams.get("utm_medium"),
+  utm_campaign: searchParams.get("utm_campaign"),
+  utm_content: searchParams.get("utm_content"),
+};
   const { startUpload, isUploading } = useUploadThing("pdfUploader", {
     // onClientUploadComplete: () => {
     //   alert("uploaded successfully!");
@@ -72,13 +79,13 @@ export default function RegisterForm() {
 
     const { cv_file, ...restData } = values;
     if (!cv_file) {
-      mutate(restData);
+    mutate({ ...restData, ...utmData });
       return;
     }
     const selectedFiles = new Array(cv_file);
     const result = await startUpload(selectedFiles);
     if (result) {
-      const data = { ...restData, cv_url: result[0].url };
+    const data = { ...restData, cv_url: result[0].url, ...utmData };
       mutate(data);
     }
   }
