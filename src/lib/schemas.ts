@@ -77,5 +77,10 @@ export const registerFormSchema = registerDataSchema
     }),
   });
 
-export const registerPostSchema = registerDataSchema.omit({});
+export const registerPostSchema = registerDataSchema.omit({}).extend({
+  utm_source: z.string().nullable().optional(),
+  utm_medium: z.string().nullable().optional(),
+  utm_campaign: z.string().nullable().optional(),
+  utm_content: z.string().nullable().optional(),
+});
 export type RegisterPostData = z.infer<typeof registerPostSchema>;
