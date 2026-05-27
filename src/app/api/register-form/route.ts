@@ -23,9 +23,9 @@ export async function POST(request: Request) {
     });
     return Response.json("OK");
   } catch (error: any) {
-    console.log(error.message);
-    return Response.json("Something went wrong", {
-      status: 500,
-    });
-  }
+  console.log("FULL ERROR:", JSON.stringify(error, null, 2));
+  console.log("ERROR MESSAGE:", error.message);
+  return Response.json(error.message || "Something went wrong", {
+    status: 500,
+  });
 }
